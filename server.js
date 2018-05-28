@@ -59,15 +59,17 @@ serialport.on('data', function (data) {
     if (mqttConnected) {
         var values = data.toString().split(':');
         // H:28.42IT:34.44X:-0.0050Y:-1.0589Z:-0.0821ET:-6.04VRMS:1.0620
-        var json = {
-            humidity: values[1].replace('IT', ''),
-            itemp: values[2].replace('X', ''),
-            accelx: values[3].replace('Y', ''),
-            accely: values[4].replace('Z', ''),
-            accelz: values[5].replace('ET', ''),
-            temp: values[6].replace('VRMS', ''),
-            vibration: values[7]
-        };
-        console.log(JSON.stringify(json));
+        if (values.length === 7) {
+            var json = {
+                humidity: values[1].replace('IT', ''),
+                itemp: values[2].replace('X', ''),
+                accelx: values[3].replace('Y', ''),
+                accely: values[4].replace('Z', ''),
+                accelz: values[5].replace('ET', ''),
+                temp: values[6].replace('VRMS', ''),
+                vibration: values[7]
+            };
+            console.log(JSON.stringify(json));
+        }
     }
 });
