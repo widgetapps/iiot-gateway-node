@@ -50,3 +50,9 @@ serialport.on('error', function(err) {
     console.log('Error: ', err.message);
     process.exit(1);
 });
+
+serialport.on('data', function (data) {
+    if (mqttConnected) {
+        console.log('Data:', data);
+    }
+});
