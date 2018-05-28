@@ -8,6 +8,7 @@ var init = require('./init')(),
     xbee_api = require('xbee-api');
 
 var client  = mqtt.connect(config.mqtt, config.mqttoptions);
+var mqttConnected = false;
 
 var C = xbee_api.constants;
 
@@ -31,10 +32,17 @@ client.on('error', function (error) {
 
 client.on('connect', function () {
     console.log('Connected to MQTT server.');
+    mqttConnected = true;
+});
 
-    xbeeAPI.parser.on("data", function(frame) {
+xbeeAPI.parser.on("data", function(frame) {
+    if (mqttConnected) {
         console.log(">>", frame);
-    });
+    }
+});
+
+serialport.on("open", function() {
+    console.log('Connected to XBee on serial port /dev/ttymxc7.');
 });
 
 // Open errors will be emitted as an error event
