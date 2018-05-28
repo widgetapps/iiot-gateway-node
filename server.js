@@ -35,13 +35,17 @@ client.on('connect', function () {
     mqttConnected = true;
 });
 
-xbeeAPI.parser.on("data", function(frame) {
+xbeeAPI.parser.on('data', function(frame) {
     if (mqttConnected) {
         console.log(">>", frame);
     }
 });
 
-serialport.on("open", function() {
+xbeeAPI.on('frame_object', function(frame) {
+    console.log('Frame OBJ> '+ frame);
+});
+
+serialport.on('open', function() {
     console.log('Connected to XBee on serial port /dev/ttymxc7.');
 });
 
@@ -53,6 +57,17 @@ serialport.on('error', function(err) {
 
 serialport.on('data', function (data) {
     if (mqttConnected) {
-        console.log('Data:', data.toString());
+        var values = data.toString().split(':');
+        // H:28.42IT:34.44X:-0.0050Y:-1.0589Z:-0.0821ET:-6.04VRMS:1.0620
+        var json = {
+            humidity: values[1].replace('IT', ''),
+            itemp: values[2].replace('X', ''),
+            accelx: values[3].replace('Y', ''),
+            accely: values[4].replace('Z', ''),
+            accelz: values[5].replace('ET', ''),
+            temp: values[6].replace('VRMS', ''),
+            vibration: values[7]
+        };
+        console.log(JSON.stringify(json));
     }
 });
