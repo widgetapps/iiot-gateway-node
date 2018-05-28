@@ -53,6 +53,6 @@ serialport.on('error', function(err) {
 
 serialport.on('data', function (data) {
     if (mqttConnected) {
-        console.log('Data:', data);
+        console.log('Data:', data.toString());
     }
 });
