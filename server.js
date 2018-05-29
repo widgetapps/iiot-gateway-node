@@ -78,8 +78,8 @@ serialport.on('data', function (data) {
 });
 
 function sendPayload(json) {
-    var packetTemp = 'DEAD0003003C0000000100010002' + checksum(Buffer.from('DEAD0003003C0000000100010002', 'hex')) + generateData(json.temp);
-    var packetVibr = 'DEAD0003003C0000000100010008' + checksum(Buffer.from('DEAD0003003C0000000100010008', 'hex')) + generateData(json.vibration);
+    var packetTemp = 'DEAD0003003C000000D800010002' + checksum(Buffer.from('DEAD0003003C000000D800010002', 'hex')) + generateData(json.temp);
+    var packetVibr = 'DEAD0003003C000000D800010008' + checksum(Buffer.from('DEAD0003003C000000D800010008', 'hex')) + generateData(json.vibration);
 
     var payloadTemp = Buffer.from(packetTemp, 'hex');
     var payloadVibr = Buffer.from(packetVibr, 'hex');
