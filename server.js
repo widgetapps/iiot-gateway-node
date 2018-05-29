@@ -94,13 +94,13 @@ function generateData(value) {
     var count = '0001';
     var timestamp = (Math.round(Date.now() / 1000)).toString(16);
     timestamp = ('00000000' + timestamp).slice(-8); // pad the front
-    var min = (Math.round(value).toString(16);
+    var min = Math.round(value).toString(16);
     min = ('0000' + min).slice(-4);
-    var max = (Math.round(value).toString(16);
+    var max = Math.round(value).toString(16);
     max = ('0000' + max).slice(-4);
     var avg = Math.round(value).toString(16);
     avg = ('0000' + avg).slice(-4);
-    var cur = (Math.round(value).toString(16);
+    var cur = Math.round(value).toString(16);
     cur = ('0000' + cur).slice(-4);
 
     console.log('VALS: [' + min + ',' + max + ',' + avg + ',' + cur + ']');
