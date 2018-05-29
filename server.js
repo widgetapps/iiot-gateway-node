@@ -5,7 +5,9 @@ var init = require('./init')(),
     util = require('./lib/util'),
     mqtt = require('mqtt'),
     SerialPort = require('serialport'),
-    xbee_api = require('xbee-api');
+    xbee_api = require('xbee-api'),
+    Parser = require('binary-parser').Parser,
+    hmac = require('./lib/hmac');
 
 var client  = mqtt.connect(config.mqtt, config.mqttoptions);
 var mqttConnected = false;
@@ -69,7 +71,65 @@ serialport.on('data', function (data) {
                 temp: values[6].replace('VRMS', ''),
                 vibration: values[7]
             };
-            console.log(JSON.stringify(json));
+            sendPayload(json);
         }
     }
 });
+
+function sendPayload(json) {
+    var packetTemp = 'DEAD0003003C0000000100010002' + checksum(Buffer.from('DEAD0003003C0000000100010002', 'hex')) + generateData(json.temp);
+    var packetVibr = 'DEAD0003003C0000000100010008' + checksum(Buffer.from('DEAD0003003C0000000100010008', 'hex')) + generateData(json.vibration);
+
+    var payloadTemp = Buffer.from(packetTemp, 'hex');
+    var payloadVibr = Buffer.from(packetVibr, 'hex');
+
+    console.log(payloadTemp.toString('hex'));
+    console.log(payloadVibr.toString('hex'));
+
+    client.publish('telemetry', payloadTemp);
+    client.publish('telemetry', payloadVibr);
+}
+
+function generateData(value) {
+    var count = '0001';
+    var timestamp = (Math.round(Date.now() / 1000)).toString(16);
+    timestamp = ('00000000' + timestamp).slice(-8); // pad the front
+    var min = (Math.round(value).toString(16);
+    min = ('0000' + min).slice(-4);
+    var max = (Math.round(value).toString(16);
+    max = ('0000' + max).slice(-4);
+    var avg = Math.round(value).toString(16);
+    avg = ('0000' + avg).slice(-4);
+    var cur = (Math.round(value).toString(16);
+    cur = ('0000' + cur).slice(-4);
+
+    console.log('VALS: [' + min + ',' + max + ',' + avg + ',' + cur + ']');
+
+    var packet = count + timestamp + min + max + avg + cur;
+    console.log('PACKET: ' + packet);
+    packet += hmac.createHmac(Buffer.from(packet, 'hex'));
+
+    return packet;
+}
+
+function checksum(buffer) {
+    var parser = new Parser()
+        .endianess('big')
+        .array(
+            'words', {
+                type: 'uint16be',
+                length: 7
+            }
+        );
+
+    var words = parser.parse(buffer);
+
+    // Check the checksum
+    //var words = dataparser.checksum(message.slice(0, util.HEADER_LENGTH - 2));
+    var checksum;
+    words.words.forEach(function(value) {
+        checksum ^= value;
+    });
+
+    return ('0000' + checksum.toString(16)).slice(-4);
+}
