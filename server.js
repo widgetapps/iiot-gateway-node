@@ -39,12 +39,12 @@ client.on('connect', function () {
 
 xbeeAPI.parser.on('data', function(frame) {
     if (mqttConnected) {
-        console.log(">>", frame);
+        // console.log(">>", frame);
     }
 });
 
 xbeeAPI.on('frame_object', function(frame) {
-    console.log('Frame OBJ> '+ frame);
+    // console.log('Frame OBJ> '+ frame);
 });
 
 serialport.on('open', function() {
@@ -71,7 +71,7 @@ serialport.on('data', function (data) {
                 temp: values[6].replace('VRMS', ''),
                 vibration: values[7]
             };
-            console.log(JSON.stringify(json));
+            // console.log(JSON.stringify(json));
             sendPayload(json);
         }
     }
@@ -84,8 +84,8 @@ function sendPayload(json) {
     var payloadTemp = Buffer.from(packetTemp, 'hex');
     var payloadVibr = Buffer.from(packetVibr, 'hex');
 
-    console.log('PAYLOAD TEMO: ' + payloadTemp.toString('hex'));
-    console.log('PAYLOAD VIBR: ' + payloadVibr.toString('hex'));
+    // console.log('PAYLOAD TEMO: ' + payloadTemp.toString('hex'));
+    // console.log('PAYLOAD VIBR: ' + payloadVibr.toString('hex'));
 
     client.publish('telemetry', payloadTemp);
     client.publish('telemetry', payloadVibr);
@@ -101,10 +101,10 @@ function generateData(value) {
     var avg = min;
     var cur = min;
 
-    console.log('VALS: [' + min + ',' + max + ',' + avg + ',' + cur + ']');
+    // console.log('VALS: [' + min + ',' + max + ',' + avg + ',' + cur + ']');
 
     var packet = count + timestamp + min + max + avg + cur;
-    console.log('PACKET: ' + packet);
+    // console.log('PACKET: ' + packet);
     packet += hmac.createHmac(Buffer.from(packet, 'hex'));
 
     return packet;
