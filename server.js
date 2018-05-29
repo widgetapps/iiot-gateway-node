@@ -71,6 +71,7 @@ serialport.on('data', function (data) {
                 temp: values[6].replace('VRMS', ''),
                 vibration: values[7]
             };
+            console.log(JSON.stringify(json));
             sendPayload(json);
         }
     }
@@ -83,8 +84,8 @@ function sendPayload(json) {
     var payloadTemp = Buffer.from(packetTemp, 'hex');
     var payloadVibr = Buffer.from(packetVibr, 'hex');
 
-    console.log(payloadTemp.toString('hex'));
-    console.log(payloadVibr.toString('hex'));
+    console.log('PAYLOAD TEMO: ' + payloadTemp.toString('hex'));
+    console.log('PAYLOAD VIBR: ' + payloadVibr.toString('hex'));
 
     client.publish('telemetry', payloadTemp);
     client.publish('telemetry', payloadVibr);
