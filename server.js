@@ -88,11 +88,11 @@ function sendPayload(sensorType, value) {
             break;
         case 2: // humi
             header += '0009';
-            value = Math.round(value * 10) / 10;
+            value = Math.round(value);
             break;
         case 3: //temp
             header += '0002';
-            value = Math.round(value * 10) / 10;
+            value = Math.round(value);
             break;
         default:
             return;
