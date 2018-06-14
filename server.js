@@ -73,8 +73,7 @@ serialport.on('data', function (data) {
 
         var packet = parser.parse(buffer);
 
-        console.log('Sensor type: ' + packet.sensor + ' Value: ' + packet.value);
-        //sendPayload(packet.sensor, packet.value);
+        sendPayload(packet.sensor, packet.value);
     }
 });
 
@@ -85,22 +84,28 @@ function sendPayload(sensorType, value) {
     switch (sensorType) {
         case 1: //vib
             header += '0008';
-            value *= 10;
+            value = Math.round(value * 100);
             break;
         case 2: // humi
             header += '0009';
+            value = Math.round(value * 10) / 10;
             break;
         case 3: //temp
             header += '0002';
+            value = Math.round(value * 10) / 10;
             break;
         default:
             return;
     }
 
+    console.log('Sensor: ' + sensorType + ' Value: ' + value);
+
     var packet = header + checksum(Buffer.from(header, 'hex')) + generateData(value);
     var payload = Buffer.from(packet, 'hex');
 
-    client.publish('telemetry', payload);
+    console.log('MQTT Packet: ' + packet);
+
+    //client.publish('telemetry', payload);
 }
 
 function generateData(value) {
