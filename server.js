@@ -113,7 +113,7 @@ function generateData(value) {
     var timestamp = (Math.round(Date.now() / 1000)).toString(16);
     timestamp = ('00000000' + timestamp).slice(-8); // pad the front
     var min = value.toString(16);
-    min = ('00000000' + min).slice(-8); // pad the front
+    min = ('0000' + min).slice(-4); // pad the front
     var max = min;
     var avg = min;
     var cur = min;
