@@ -98,12 +98,12 @@ function sendPayload(sensorType, value) {
             return;
     }
 
-    console.log('Sensor: ' + sensorType + ' Value: ' + value);
+    // console.log('Sensor: ' + sensorType + ' Value: ' + value);
 
     var packet = header + checksum(Buffer.from(header, 'hex')) + generateData(value);
     var payload = Buffer.from(packet, 'hex');
 
-    console.log('MQTT Packet: ' + packet);
+    // console.log('MQTT Packet: ' + packet);
 
     client.publish('telemetry', payload);
 }
