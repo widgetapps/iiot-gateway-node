@@ -73,7 +73,8 @@ serialport.on('data', function (data) {
 
         var packet = parser.parse(buffer);
 
-        sendPayload(packet.sensor, packet.value);
+        console.log('Sensor type: ' + packet.sensor + ' Value: ' + packet.value);
+        //sendPayload(packet.sensor, packet.value);
     }
 });
 
