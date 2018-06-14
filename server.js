@@ -59,7 +59,7 @@ serialport.on('error', function(err) {
 
 serialport.on('data', function (data) {
     if (mqttConnected) {
-        console.log(data);
+        console.log(data.toString());
         var values = data.toString().split(':');
         // H:28.42IT:34.44X:-0.0050Y:-1.0589Z:-0.0821ET:-6.04VRMS:1.0620
         if (values.length === 8) {
