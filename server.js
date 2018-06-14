@@ -105,7 +105,7 @@ function sendPayload(sensorType, value) {
 
     console.log('MQTT Packet: ' + packet);
 
-    //client.publish('telemetry', payload);
+    client.publish('telemetry', payload);
 }
 
 function generateData(value) {
