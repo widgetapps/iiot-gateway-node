@@ -59,45 +59,55 @@ serialport.on('error', function(err) {
 
 serialport.on('data', function (data) {
     if (mqttConnected) {
-        console.log(data.toString());
-        var values = data.toString().split(':');
-        // H:28.42IT:34.44X:-0.0050Y:-1.0589Z:-0.0821ET:-6.04VRMS:1.0620
-        if (values.length === 8) {
-            var json = {
-                humidity: values[1].replace('IT', ''),
-                itemp: values[2].replace('X', ''),
-                accelx: values[3].replace('Y', ''),
-                accely: values[4].replace('Z', ''),
-                accelz: values[5].replace('ET', ''),
-                temp: values[6].replace('VRMS', ''),
-                vibration: values[7]
-            };
-            // console.log(JSON.stringify(json));
-            //sendPayload(json);
-        }
+        var hexString = data.toString();
+
+        if (hexString.length !== 14) return;
+
+        const buffer = Buffer.from(hexString, 'hex');
+
+        var parser = new Parser()
+            .endianess('big')
+            .uint16('stx')
+            .uint8('sensor')
+            .float('value');
+
+        var packet = parser.parse(buffer);
+
+        sendPayload(packet.sensor, packet.value);
     }
 });
 
-function sendPayload(json) {
-    var packetTemp = 'DEAD0003003C000000D800010002' + checksum(Buffer.from('DEAD0003003C000000D800010002', 'hex')) + generateData(parseFloat(json.temp) + 30);
-    var packetVibr = 'DEAD0003003C000000D800010008' + checksum(Buffer.from('DEAD0003003C000000D800010008', 'hex')) + generateData(parseFloat(json.vibration) * 10);
+function sendPayload(sensorType, value) {
 
-    var payloadTemp = Buffer.from(packetTemp, 'hex');
-    var payloadVibr = Buffer.from(packetVibr, 'hex');
+    var header = 'DEAD0003003C000000D80001';
 
-    // console.log('PAYLOAD TEMO: ' + payloadTemp.toString('hex'));
-    // console.log('PAYLOAD VIBR: ' + payloadVibr.toString('hex'));
+    switch (sensorType) {
+        case 1: //vib
+            header += '0008';
+            value *= 10;
+            break;
+        case 2: // humi
+            header += '0009';
+            break;
+        case 3: //temp
+            header += '0002';
+            break;
+        default:
+            return;
+    }
 
-    client.publish('telemetry', payloadTemp);
-    client.publish('telemetry', payloadVibr);
+    var packet = header + checksum(Buffer.from(header, 'hex')) + generateData(value);
+    var payload = Buffer.from(packet, 'hex');
+
+    client.publish('telemetry', payload);
 }
 
 function generateData(value) {
     var count = '0001';
     var timestamp = (Math.round(Date.now() / 1000)).toString(16);
     timestamp = ('00000000' + timestamp).slice(-8); // pad the front
-    var min = Math.round(Math.abs(value)).toString(16);
-    min = ('0000' + min).slice(-4);
+    var min = value.toString(16);
+    min = ('00000000' + min).slice(-8); // pad the front
     var max = min;
     var avg = min;
     var cur = min;
