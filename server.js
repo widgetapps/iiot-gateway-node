@@ -20,6 +20,7 @@ fs.readFile(config.configpath + 'config.json', 'utf8', (err, data) => {
     } else {
         let configObj = JSON.parse(data);
         config.mqtt = configObj.mqtt;
+        config.multiplier = configObj.multiplier;
         config.mqttoptions.username = configObj.mqttlogin;
         config.mqttoptions.password = configObj.mqttpassword;
         client = mqtt.connect(config.mqtt, config.mqttoptions);
@@ -98,7 +99,7 @@ function sendPayload(sensorType, value) {
     switch (sensorType) {
         case 1: //vib
             header += '0008';
-            value = Math.round(value * 100);
+            value = Math.round(value * config.multiplier);
             break;
         case 2: // humi
             header += '0009';
