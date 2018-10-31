@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var fs = require('fs');
+let fs = require('fs');
 
 /**
  * Module init function.

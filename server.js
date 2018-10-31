@@ -1,24 +1,48 @@
 'use strict';
 
-var init = require('./init')(),
-    config = require('./config'),
+require('./init')();
+
+let config = require('./config'),
     util = require('./lib/util'),
     mqtt = require('mqtt'),
     SerialPort = require('serialport'),
     xbee_api = require('xbee-api'),
     Parser = require('binary-parser').Parser,
-    hmac = require('./lib/hmac');
+    hmac = require('./lib/hmac'),
+    fs = require('fs');
 
-var client  = mqtt.connect(config.mqtt, config.mqttoptions);
-var mqttConnected = false;
+let client;
+let mqttConnected = false;
 
-var C = xbee_api.constants;
+fs.readFile(config.configpath + 'config.json', 'utf8', (err, data) => {
+    if (err){
+        console.error(err);
+    } else {
+        let configObj = JSON.parse(data);
+        config.mqtt = configObj.mqtt;
+        config.mqttoptions.username = configObj.mqttlogin;
+        config.mqttoptions.password = configObj.mqttpassword;
+        client = mqtt.connect(config.mqtt, config.mqttoptions);
 
-var xbeeAPI = new xbee_api.XBeeAPI({
+        client.on('error', function (error) {
+            console.log('Error connecting to MQTT Server with username ' + config.mqttoptions.username + ' and password ' + config.mqttoptions.password + ' - ' + error);
+            process.exit(1);
+        });
+
+        client.on('connect', function () {
+            console.log('Connected to MQTT server.');
+            mqttConnected = true;
+        });
+    }
+});
+
+let C = xbee_api.constants;
+
+let xbeeAPI = new xbee_api.XBeeAPI({
     api_mode: 1
 });
 
-var serialport = new SerialPort('/dev/ttymxc7', {
+let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600,
 });
 
@@ -26,16 +50,6 @@ serialport.pipe(xbeeAPI.parser);
 xbeeAPI.builder.pipe(serialport);
 
 console.log('Started on IP ' + config.ip + '. NODE_ENV=' + process.env.NODE_ENV);
-
-client.on('error', function (error) {
-    console.log('Error connecting to MQTT Server with username ' + config.mqttoptions.username + ' and password ' + config.mqttoptions.password + ' - ' + error);
-    process.exit(1);
-});
-
-client.on('connect', function () {
-    console.log('Connected to MQTT server.');
-    mqttConnected = true;
-});
 
 xbeeAPI.parser.on('data', function(frame) {
     if (mqttConnected) {
@@ -59,19 +73,19 @@ serialport.on('error', function(err) {
 
 serialport.on('data', function (data) {
     if (mqttConnected) {
-        var hexString = data.toString();
+        let hexString = data.toString();
 
         if (hexString.length !== 14) return;
 
         const buffer = Buffer.from(hexString, 'hex');
 
-        var parser = new Parser()
+        let parser = new Parser()
             .endianess('big')
             .uint16('stx')
             .uint8('sensor')
             .float('value');
 
-        var packet = parser.parse(buffer);
+        let packet = parser.parse(buffer);
 
         sendPayload(packet.sensor, packet.value);
     }
@@ -79,7 +93,7 @@ serialport.on('data', function (data) {
 
 function sendPayload(sensorType, value) {
 
-    var header = 'DEAD0003003C000000D80001';
+    let header = 'DEAD0003003C000000D80001';
 
     switch (sensorType) {
         case 1: //vib
@@ -100,8 +114,8 @@ function sendPayload(sensorType, value) {
 
     // console.log('Sensor: ' + sensorType + ' Value: ' + value);
 
-    var packet = header + checksum(Buffer.from(header, 'hex')) + generateData(value);
-    var payload = Buffer.from(packet, 'hex');
+    let packet = header + checksum(Buffer.from(header, 'hex')) + generateData(value);
+    let payload = Buffer.from(packet, 'hex');
 
     // console.log('MQTT Packet: ' + packet);
 
@@ -109,18 +123,20 @@ function sendPayload(sensorType, value) {
 }
 
 function generateData(value) {
-    var count = '0001';
-    var timestamp = (Math.round(Date.now() / 1000)).toString(16);
-    timestamp = ('00000000' + timestamp).slice(-8); // pad the front
-    var min = value.toString(16);
-    min = ('0000' + min).slice(-4); // pad the front
-    var max = min;
-    var avg = min;
-    var cur = min;
+    let count = '0001';
+    let timestamp = (Math.round(Date.now() / 1000)).toString(16);
+    timestamp = util.pad('00000000', timestamp);
+    //timestamp = ('00000000' + timestamp).slice(-8); // pad the front
+    let min = value.toString(16);
+    min = util.pad('0000', min);
+    //min = ('0000' + min).slice(-4); // pad the front
+    let max = min;
+    let avg = min;
+    let cur = min;
 
     // console.log('VALS: [' + min + ',' + max + ',' + avg + ',' + cur + ']');
 
-    var packet = count + timestamp + min + max + avg + cur;
+    let packet = count + timestamp + min + max + avg + cur;
     // console.log('PACKET: ' + packet);
     packet += hmac.createHmac(Buffer.from(packet, 'hex'));
 
@@ -128,7 +144,7 @@ function generateData(value) {
 }
 
 function checksum(buffer) {
-    var parser = new Parser()
+    let parser = new Parser()
         .endianess('big')
         .array(
             'words', {
@@ -137,11 +153,11 @@ function checksum(buffer) {
             }
         );
 
-    var words = parser.parse(buffer);
+    let words = parser.parse(buffer);
 
     // Check the checksum
     //var words = dataparser.checksum(message.slice(0, util.HEADER_LENGTH - 2));
-    var checksum;
+    let checksum;
     words.words.forEach(function(value) {
         checksum ^= value;
     });
