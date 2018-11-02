@@ -127,5 +127,5 @@ function sendPayload(sensorType, value) {
     if (config.prefix !== '') {
         prefix += config.prefix + '/';
     }
-    client.publish(prefix + 'v1/' + sensorId + '/' + sensor, new Buffer(json));
+    client.publish(prefix + 'v1/' + sensorId + '/' + sensor, Buffer.from(JSON.stringify(json)));
 }
