@@ -3,13 +3,12 @@
 require('./init')();
 
 let config = require('./config'),
-    util = require('./lib/util'),
     mqtt = require('mqtt'),
     SerialPort = require('serialport'),
     xbee_api = require('xbee-api'),
     Parser = require('binary-parser').Parser,
-    hmac = require('./lib/hmac'),
-    fs = require('fs');
+    fs = require('fs'),
+    cbor = require('cbor');
 
 let client;
 let mqttConnected = false;
@@ -20,6 +19,7 @@ fs.readFile(config.configpath + 'config.json', 'utf8', (err, data) => {
     } else {
         let configObj = JSON.parse(data);
         config.mqtt = configObj.mqtt;
+        config.prefix = configObj.prefix;
         config.multiplier = configObj.multiplier;
         config.mqttoptions.username = configObj.mqttlogin;
         config.mqttoptions.password = configObj.mqttpassword;
@@ -94,19 +94,20 @@ serialport.on('data', function (data) {
 
 function sendPayload(sensorType, value) {
 
-    let header = 'DEAD0003003C000000D80001';
+    let sensor = '';
+    let sensorId = '5bdc2e4020433a23474c302a';
 
     switch (sensorType) {
         case 1: //vib
-            header += '0008';
+            sensor = 'vibration';
             value = Math.round(value * config.multiplier);
             break;
         case 2: // humi
-            header += '0009';
+            sensor = 'humidity';
             value = Math.round(value);
             break;
         case 3: //temp
-            header += '0002';
+            sensor = 'temperature';
             value = Math.round(value);
             break;
         default:
@@ -114,54 +115,16 @@ function sendPayload(sensorType, value) {
     }
 
     // console.log('Sensor: ' + sensorType + ' Value: ' + value);
-
-    let packet = header + checksum(Buffer.from(header, 'hex')) + generateData(value);
-    let payload = Buffer.from(packet, 'hex');
-
-    // console.log('MQTT Packet: ' + packet);
-
-    client.publish('telemetry', payload);
-}
-
-function generateData(value) {
-    let count = '0001';
-    let timestamp = (Math.round(Date.now() / 1000)).toString(16);
-    timestamp = util.pad('00000000', timestamp);
-    //timestamp = ('00000000' + timestamp).slice(-8); // pad the front
-    let min = value.toString(16);
-    min = util.pad('0000', min);
-    //min = ('0000' + min).slice(-4); // pad the front
-    let max = min;
-    let avg = min;
-    let cur = min;
-
-    // console.log('VALS: [' + min + ',' + max + ',' + avg + ',' + cur + ']');
-
-    let packet = count + timestamp + min + max + avg + cur;
-    // console.log('PACKET: ' + packet);
-    packet += hmac.createHmac(Buffer.from(packet, 'hex'));
-
-    return packet;
-}
-
-function checksum(buffer) {
-    let parser = new Parser()
-        .endianess('big')
-        .array(
-            'words', {
-                type: 'uint16be',
-                length: 7
-            }
-        );
-
-    let words = parser.parse(buffer);
-
-    // Check the checksum
-    //var words = dataparser.checksum(message.slice(0, util.HEADER_LENGTH - 2));
-    let checksum;
-    words.words.forEach(function(value) {
-        checksum ^= value;
+    let payload = cbor.encode({
+        date: new Date(),
+        value: value
     });
 
-    return ('0000' + checksum.toString(16)).slice(-4);
+    // console.log('MQTT Payload: ' + payload);
+
+    let prefix = '/';
+    if (config.prefix !== '') {
+        prefix += config.prefix + '/';
+    }
+    client.publish(prefix + 'v1/' + sensorId + '/' + sensorType, payload);
 }

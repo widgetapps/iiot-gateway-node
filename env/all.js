@@ -9,5 +9,6 @@ module.exports = {
     ip: process.env.IP || '127.0.0.1',
     configpath: process.env.CONFIG_PATH || './',
     mqtt: process.env.MQTT || 'mqtt://mqtt.terepac.one',
+    prefix: '',
     multiplier: 100
 };
