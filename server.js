@@ -115,10 +115,11 @@ function sendPayload(sensorType, value) {
     }
 
     // console.log('Sensor: ' + sensorType + ' Value: ' + value);
-    let payload = cbor.encode({
+    let json = {
         date: new Date(),
         value: value
-    });
+    };
+    let payload = cbor.encode(json);
 
     // console.log('MQTT Payload: ' + payload);
 
@@ -126,5 +127,5 @@ function sendPayload(sensorType, value) {
     if (config.prefix !== '') {
         prefix += config.prefix + '/';
     }
-    client.publish(prefix + 'v1/' + sensorId + '/' + sensorType, payload);
+    client.publish(prefix + 'v1/' + sensorId + '/' + sensor, json);
 }
