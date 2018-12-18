@@ -37,21 +37,21 @@ fs.readFile(config.configpath + 'config.json', 'utf8', (err, data) => {
     }
 });
 
-let C = xbee_api.constants;
+// let C = xbee_api.constants;
 
-let xbeeAPI = new xbee_api.XBeeAPI({
-    api_mode: 1
-});
+// let xbeeAPI = new xbee_api.XBeeAPI({
+//     api_mode: 1
+// });
 
 let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600
 });
 
 //serialport.pipe(xbeeAPI.parser);
-xbeeAPI.builder.pipe(serialport);
+// xbeeAPI.builder.pipe(serialport);
 
 console.log('Started on IP ' + config.ip + '. NODE_ENV=' + process.env.NODE_ENV);
-
+/*
 xbeeAPI.parser.on('data', function(frame) {
     if (mqttConnected) {
         console.log(">>", frame);
@@ -61,6 +61,7 @@ xbeeAPI.parser.on('data', function(frame) {
 xbeeAPI.on('frame_object', function(frame) {
     console.log('Frame OBJ> '+ frame);
 });
+*/
 
 serialport.on('open', function() {
     console.log('Connected to XBee on serial port /dev/ttymxc7.');
