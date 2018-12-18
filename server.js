@@ -44,7 +44,7 @@ let xbeeAPI = new xbee_api.XBeeAPI({
 });
 
 let serialport = new SerialPort('/dev/ttymxc7', {
-    baudRate: 9600,
+    baudRate: 9600
 });
 
 serialport.pipe(xbeeAPI.parser);
