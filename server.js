@@ -6,6 +6,7 @@ let config = require('./config'),
     mqtt = require('mqtt'),
     SerialPort = require('serialport'),
     Readline = require('@serialport/parser-readline'),
+    Delimiter = require('@serialport/parser-delimiter'),
     xbee_api = require('xbee-api'),
     Parser = require('binary-parser').Parser,
     fs = require('fs'),
@@ -48,7 +49,7 @@ let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600
 });
 
-const parser = serialport.pipe(new Readline({ delimiter: '\r\n' }));
+const parser = serialport.pipe(new Delimiter({ delimiter: 'DEAD' }));
 
 parser.on('data', function (data) {
     let hexString = data.toString();
