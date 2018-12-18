@@ -5,6 +5,7 @@ require('./init')();
 let config = require('./config'),
     mqtt = require('mqtt'),
     SerialPort = require('serialport'),
+    Readline = require('@serialport/parser-readline'),
     xbee_api = require('xbee-api'),
     Parser = require('binary-parser').Parser,
     fs = require('fs'),
@@ -47,6 +48,13 @@ let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600
 });
 
+const parser = serialport.pipe(new Readline({ delimiter: '\n' }));
+
+parser.on('data', function (data) {
+    let hexString = data.toString();
+    console.log('Got data: ' + hexString);
+});
+
 //serialport.pipe(xbeeAPI.parser);
 // xbeeAPI.builder.pipe(serialport);
 
@@ -73,6 +81,7 @@ serialport.on('error', function(err) {
     process.exit(1);
 });
 
+/*
 serialport.on('data', function (data) {
     //console.log('Data received: ' + data.toString());
     if (mqttConnected) {
@@ -95,6 +104,7 @@ serialport.on('data', function (data) {
         //sendPayload(packet.sensor, packet.value);
     }
 });
+*/
 
 function sendPayload(sensorType, value) {
 
