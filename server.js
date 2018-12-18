@@ -48,7 +48,7 @@ let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600
 });
 
-const parser = serialport.pipe(new Readline({ delimiter: '\n' }));
+const parser = serialport.pipe(new Readline({ delimiter: '\r\n' }));
 
 parser.on('data', function (data) {
     let hexString = data.toString();
