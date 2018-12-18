@@ -80,6 +80,8 @@ serialport.on('data', function (data) {
 
         const buffer = Buffer.from(hexString, 'hex');
 
+        console.log('Got data: ' + buffer);
+
         let parser = new Parser()
             .endianess('big')
             .uint16('stx')
@@ -88,7 +90,7 @@ serialport.on('data', function (data) {
 
         let packet = parser.parse(buffer);
 
-        sendPayload(packet.sensor, packet.value);
+        //sendPayload(packet.sensor, packet.value);
     }
 });
 
