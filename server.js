@@ -49,11 +49,17 @@ let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600
 });
 
+/*
 const parser = serialport.pipe(new Delimiter({ delimiter: 'DEAD' }));
 
 parser.on('data', function (data) {
     let hexString = data.toString();
     console.log('Got data: ' + hexString);
+});
+*/
+
+serialport.on('readable', function () {
+    console.log('Data:', port.read());
 });
 
 //serialport.pipe(xbeeAPI.parser);
