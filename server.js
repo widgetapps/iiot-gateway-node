@@ -59,7 +59,7 @@ parser.on('data', function (data) {
 */
 
 serialport.on('readable', function () {
-    console.log('Data:', port.read());
+    console.log('Data:', serialport.read());
 });
 
 //serialport.pipe(xbeeAPI.parser);
