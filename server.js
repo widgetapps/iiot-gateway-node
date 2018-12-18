@@ -26,7 +26,7 @@ fs.readFile(config.configpath + 'config.json', 'utf8', (err, data) => {
         client = mqtt.connect(config.mqtt, config.mqttoptions);
 
         client.on('error', function (error) {
-            console.log('Error connecting to MQTT Server with username ' + config.mqttoptions.username + ' and password ' + config.mqttoptions.password + ' - ' + error);
+            console.log('Error connecting to MQTT Server with username ' + config.mqttoptions.username + ' - ' + error);
             process.exit(1);
         });
 
@@ -64,13 +64,6 @@ xbeeAPI.on('frame_object', function(frame) {
 
 serialport.on('open', function() {
     console.log('Connected to XBee on serial port /dev/ttymxc7.');
-    let frame_obj = { // AT Request to be sent
-        type: C.FRAME_TYPE.AT_COMMAND,
-        command: "NI",
-        commandParameter: [],
-    };
-
-    xbeeAPI.builder.write(frame_obj);
 });
 
 // Open errors will be emitted as an error event
@@ -88,7 +81,7 @@ serialport.on('data', function (data) {
 
         const buffer = Buffer.from(hexString, 'hex');
 
-        console.log('Got data: ' + buffer);
+        console.log('Got data: ' + hexString);
 
         let parser = new Parser()
             .endianess('big')
