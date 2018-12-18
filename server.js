@@ -47,7 +47,7 @@ let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600
 });
 
-serialport.pipe(xbeeAPI.parser);
+//serialport.pipe(xbeeAPI.parser);
 xbeeAPI.builder.pipe(serialport);
 
 console.log('Started on IP ' + config.ip + '. NODE_ENV=' + process.env.NODE_ENV);
