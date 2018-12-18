@@ -43,7 +43,7 @@ let xbeeAPI = new xbee_api.XBeeAPI({
     api_mode: 1
 });
 
-let serialport = new SerialPort('/dev/ttymxc6', {
+let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600
 });
 
@@ -64,6 +64,13 @@ xbeeAPI.on('frame_object', function(frame) {
 
 serialport.on('open', function() {
     console.log('Connected to XBee on serial port /dev/ttymxc7.');
+    let frame_obj = { // AT Request to be sent
+        type: C.FRAME_TYPE.AT_COMMAND,
+        command: "NI",
+        commandParameter: [],
+    };
+
+    xbeeAPI.builder.write(frame_obj);
 });
 
 // Open errors will be emitted as an error event
