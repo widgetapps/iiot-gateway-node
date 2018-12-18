@@ -54,12 +54,12 @@ console.log('Started on IP ' + config.ip + '. NODE_ENV=' + process.env.NODE_ENV)
 
 xbeeAPI.parser.on('data', function(frame) {
     if (mqttConnected) {
-        // console.log(">>", frame);
+        console.log(">>", frame);
     }
 });
 
 xbeeAPI.on('frame_object', function(frame) {
-    // console.log('Frame OBJ> '+ frame);
+    console.log('Frame OBJ> '+ frame);
 });
 
 serialport.on('open', function() {
