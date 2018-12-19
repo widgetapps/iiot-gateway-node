@@ -128,10 +128,10 @@ function sendPayload(packet) {
     console.log('-----------------------------------------------');
     */
 
-    /*
     payload['vibration'] = cbor.encode(json['vibration']);
     payload['humidity'] = cbor.encode(json['humidity']);
     payload['temperature'] = cbor.encode(json['temperature']);
+    /*
     console.log('v:' + payload['vibration']);
     console.log('h:' + payload['humidity']);
     console.log('t:' + payload['temperature']);
