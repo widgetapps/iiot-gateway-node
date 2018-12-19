@@ -105,10 +105,14 @@ serialParser.on('data', function (data) {
         let parser = new Parser()
             .endianess('big')
             .uint16('stx')
-            .uint8('sensor')
-            .float('value');
+            .float('serialNumber')
+            .float('vibration')
+            .float('humidity')
+            .float('temperature');
 
         let packet = parser.parse(buffer);
+
+        console.log(JSON.stringify(packet));
 
         //sendPayload(packet.sensor, packet.value);
     }
