@@ -86,7 +86,7 @@ const serialParser = serialport.pipe(new Readline({ delimiter: '\n' }));
 serialParser.on('data', function (data) {
     if (mqttConnected) {
         let hexString = data.toString();
-        console.log('Got data: ' + hexString);
+        console.log('Got data:   ' + hexString);
 
         if  (hexString.substr(0,4) !== 'DEAD') {
             let beginning = hexString.substr(8, 12);
