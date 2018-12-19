@@ -57,7 +57,6 @@ const serialParser = serialport.pipe(new Readline({ delimiter: '\n' }));
 serialParser.on('data', function (data) {
     if (mqttConnected) {
         let hexString = data.toString();
-        // console.log('Got data:   ' + hexString);
 
         if  (hexString.substr(0,4) !== 'DEAD') {
             let beginning = hexString.substr(8, 12);
@@ -66,8 +65,6 @@ serialParser.on('data', function (data) {
             hexString = beginning + middle + end;
             if (hexString.substr(0,4) !== 'DEAD') return;
         }
-
-        //console.log('Fixed data: ' + hexString);
 
         if (hexString.length !== 36) return;
 
@@ -83,16 +80,7 @@ serialParser.on('data', function (data) {
 
         let packet = parser.parse(buffer);
 
-        //console.log('Parsed: ' + JSON.stringify(packet));
-
         packet.serialNumber = Math.round(packet.serialNumber * 10) / 10;
-
-        /*
-        console.log('Serial number: ' + packet.serialNumber);
-        console.log('Vibration: ' + packet.vibration);
-        console.log('Humidity: ' + packet.humidity);
-        console.log('Temperature: ' + packet.temperature);
-        */
 
         sendPayload(packet);
     }
@@ -119,23 +107,9 @@ function sendPayload(packet) {
         value: packet.temperature
     };
 
-    /*
-    console.log('Serial #: ' + packet.serialNumber);
-    console.log('ID: ' + sensorId);
-    console.log('v:' + JSON.stringify(json['vibration']));
-    console.log('h:' + JSON.stringify(json['humidity']));
-    console.log('t:' + JSON.stringify(json['temperature']));
-    console.log('-----------------------------------------------');
-    */
-
     payload['vibration'] = cbor.encode(json['vibration']);
     payload['humidity'] = cbor.encode(json['humidity']);
     payload['temperature'] = cbor.encode(json['temperature']);
-    /*
-    console.log('v:' + payload['vibration']);
-    console.log('h:' + payload['humidity']);
-    console.log('t:' + payload['temperature']);
-    */
 
     let prefix = '';
     if (config.prefix !== '') {
@@ -147,8 +121,4 @@ function sendPayload(packet) {
     client.publish(topicPrefix + 'vibration', payload['vibration']);
     client.publish(topicPrefix + 'humidity', payload['humidity']);
     client.publish(topicPrefix + 'temperature', payload['temperature']);
-
-    console.log(topicPrefix + 'vibration');
-    console.log(topicPrefix + 'humidity');
-    console.log(topicPrefix + 'temperature');
 }
