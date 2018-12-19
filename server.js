@@ -86,7 +86,7 @@ const serialParser = serialport.pipe(new Readline({ delimiter: '\n' }));
 serialParser.on('data', function (data) {
     if (mqttConnected) {
         let hexString = data.toString();
-        console.log('Got data:   ' + hexString);
+        //console.log('Got data:   ' + hexString);
 
         if  (hexString.substr(0,4) !== 'DEAD') {
             let beginning = hexString.substr(8, 12);
@@ -96,7 +96,7 @@ serialParser.on('data', function (data) {
             if (hexString.substr(0,4) !== 'DEAD') return;
         }
 
-        console.log('Fixed data: ' + hexString);
+        //console.log('Fixed data: ' + hexString);
 
         if (hexString.length !== 36) return;
 
@@ -106,13 +106,17 @@ serialParser.on('data', function (data) {
             .endianess('big')
             .uint16('stx')
             .float('serialNumber')
-            .float('humidity')
             .float('vibration')
+            .float('humidity')
             .float('temperature');
 
         let packet = parser.parse(buffer);
 
-        console.log('Parsed: ' + JSON.stringify(packet));
+        //console.log('Parsed: ' + JSON.stringify(packet));
+        console.log('Serial number: ' + Math.round(packet.serialNumber * 10) / 10);
+        console.log('Vibration: ' + packet.vibration);
+        console.log('Humidity: ' + packet.humidity);
+        console.log('Temperature: ' + packet.temperature);
 
         //sendPayload(packet.sensor, packet.value);
     }
