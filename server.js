@@ -112,7 +112,7 @@ serialParser.on('data', function (data) {
 
         let packet = parser.parse(buffer);
 
-        console.log(JSON.stringify(packet));
+        console.log('Parsed: ' + JSON.stringify(packet));
 
         //sendPayload(packet.sensor, packet.value);
     }
