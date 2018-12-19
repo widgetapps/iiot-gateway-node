@@ -106,8 +106,8 @@ serialParser.on('data', function (data) {
             .endianess('big')
             .uint16('stx')
             .float('serialNumber')
-            .float('vibration')
             .float('humidity')
+            .float('vibration')
             .float('temperature');
 
         let packet = parser.parse(buffer);
