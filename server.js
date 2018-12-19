@@ -125,9 +125,9 @@ function sendPayload(packet) {
     console.log('h:' + JSON.stringify(json['humidity']));
     console.log('t:' + JSON.stringify(json['temperature']));
 
-    payload['vibration'] = cbor.encode(json);
-    payload['humidity'] = cbor.encode(json);
-    payload['temperature'] = cbor.encode(json);
+    payload['vibration'] = cbor.encode(json['vibration']);
+    payload['humidity'] = cbor.encode(json['humidity']);
+    payload['temperature'] = cbor.encode(json['temperature']);
     console.log('v:' + payload['vibration']);
     console.log('h:' + payload['humidity']);
     console.log('t:' + payload['temperature']);
