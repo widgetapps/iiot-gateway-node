@@ -119,14 +119,14 @@ function sendPayload(packet) {
         value: packet.temperature
     };
 
-
+    /*
     console.log('Serial #: ' + packet.serialNumber);
     console.log('ID: ' + sensorId);
     console.log('v:' + JSON.stringify(json['vibration']));
     console.log('h:' + JSON.stringify(json['humidity']));
     console.log('t:' + JSON.stringify(json['temperature']));
     console.log('-----------------------------------------------');
-
+    */
 
     /*
     payload['vibration'] = cbor.encode(json['vibration']);
@@ -142,7 +142,13 @@ function sendPayload(packet) {
         prefix += config.prefix + '/';
     }
 
-    client.publish(prefix + sensorId + '/' + source + '/v1/vibration', payload['vibration']);
-    client.publish(prefix + sensorId + '/' + source + '/v1/humidity', payload['humidity']);
-    client.publish(prefix + sensorId + '/' + source + '/v1/temperature', payload['temperature']);
+    let topicPrefix = prefix + sensorId + '/' + source + '/v1/';
+
+    client.publish(topicPrefix + 'vibration', payload['vibration']);
+    client.publish(topicPrefix + 'humidity', payload['humidity']);
+    client.publish(topicPrefix + 'temperature', payload['temperature']);
+
+    console.log(topicPrefix + 'vibration');
+    console.log(topicPrefix + 'humidity');
+    console.log(topicPrefix + 'temperature');
 }
