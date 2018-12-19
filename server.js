@@ -6,8 +6,6 @@ let config = require('./config'),
     mqtt = require('mqtt'),
     SerialPort = require('serialport'),
     Readline = require('@serialport/parser-readline'),
-    Delimiter = require('@serialport/parser-delimiter'),
-    xbee_api = require('xbee-api'),
     Parser = require('binary-parser').Parser,
     fs = require('fs'),
     cbor = require('cbor');
@@ -39,37 +37,9 @@ fs.readFile(config.configpath + 'config.json', 'utf8', (err, data) => {
     }
 });
 
-// let C = xbee_api.constants;
-
-// let xbeeAPI = new xbee_api.XBeeAPI({
-//     api_mode: 1
-// });
-
 let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600
 });
-
-/*
-
-serialport.on('readable', function () {
-    console.log('Data:', serialport.read());
-});
-
-//serialport.pipe(xbeeAPI.parser);
-// xbeeAPI.builder.pipe(serialport);
-
-console.log('Started on IP ' + config.ip + '. NODE_ENV=' + process.env.NODE_ENV);
-/*
-xbeeAPI.parser.on('data', function(frame) {
-    if (mqttConnected) {
-        console.log(">>", frame);
-    }
-});
-
-xbeeAPI.on('frame_object', function(frame) {
-    console.log('Frame OBJ> '+ frame);
-});
-*/
 
 serialport.on('open', function() {
     console.log('Connected to XBee on serial port /dev/ttymxc7.');
@@ -86,7 +56,7 @@ const serialParser = serialport.pipe(new Readline({ delimiter: '\n' }));
 serialParser.on('data', function (data) {
     if (mqttConnected) {
         let hexString = data.toString();
-        //console.log('Got data:   ' + hexString);
+        console.log('Got data:   ' + hexString);
 
         if  (hexString.substr(0,4) !== 'DEAD') {
             let beginning = hexString.substr(8, 12);
@@ -124,31 +94,6 @@ serialParser.on('data', function (data) {
         //sendPayload(packet.sensor, packet.value);
     }
 });
-
-/*
-serialport.on('data', function (data) {
-    //console.log('Data received: ' + data.toString());
-    if (mqttConnected) {
-        let hexString = data.toString();
-
-        console.log('Got data: ' + hexString);
-
-        if (hexString.length !== 14) return;
-
-        const buffer = Buffer.from(hexString, 'hex');
-
-        let parser = new Parser()
-            .endianess('big')
-            .uint16('stx')
-            .uint8('sensor')
-            .float('value');
-
-        let packet = parser.parse(buffer);
-
-        //sendPayload(packet.sensor, packet.value);
-    }
-});
-*/
 
 function sendPayload(sensorType, value) {
 
