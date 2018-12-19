@@ -119,13 +119,14 @@ function sendPayload(packet) {
         value: packet.temperature
     };
 
+
     console.log('Serial #: ' + packet.serialNumber);
     console.log('ID: ' + sensorId);
-    /*
     console.log('v:' + JSON.stringify(json['vibration']));
     console.log('h:' + JSON.stringify(json['humidity']));
     console.log('t:' + JSON.stringify(json['temperature']));
-    */
+    console.log('-----------------------------------------------');
+
 
     /*
     payload['vibration'] = cbor.encode(json['vibration']);
