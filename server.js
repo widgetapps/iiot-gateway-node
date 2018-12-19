@@ -8,7 +8,8 @@ let config = require('./config'),
     Readline = require('@serialport/parser-readline'),
     Parser = require('binary-parser').Parser,
     fs = require('fs'),
-    cbor = require('cbor');
+    cbor = require('cbor'),
+    md5 = require('md5');
 
 let client;
 let mqttConnected = false;
@@ -86,49 +87,58 @@ serialParser.on('data', function (data) {
 
         packet.serialNumber = Math.round(packet.serialNumber * 10) / 10;
 
+        /*
         console.log('Serial number: ' + packet.serialNumber);
         console.log('Vibration: ' + packet.vibration);
         console.log('Humidity: ' + packet.humidity);
         console.log('Temperature: ' + packet.temperature);
+        */
 
-        //sendPayload(packet.sensor, packet.value);
+        sendPayload(packet);
     }
 });
 
-function sendPayload(sensorType, value) {
+function sendPayload(packet) {
 
-    let sensor = '';
-    let sensorId = '5bdc2e4020433a23474c302a';
+    let sensorId = md5(packet.serialNumber);
+    let source = 'gateway';
 
-    switch (sensorType) {
-        case 1: //vib
-            sensor = 'vibration';
-            value = Math.round(value * config.multiplier);
-            break;
-        case 2: // humi
-            sensor = 'humidity';
-            value = Math.round(value);
-            break;
-        case 3: //temp
-            sensor = 'temperature';
-            value = Math.round(value);
-            break;
-        default:
-            return;
-    }
+    let json = {};
+    let payload = {};
 
-    // console.log('Sensor: ' + sensorType + ' Value: ' + value);
-    let json = {
+    json['vibration'] = {
         date: new Date(),
-        value: value
+        value: Math.round(packet.vibration * config.multiplier)
     };
-    let payload = cbor.encode(json);
+    json['humidity'] = {
+        date: new Date(),
+        value: packet.humidity
+    };
+    json['temperature'] = {
+        date: new Date(),
+        value: packet.temperature
+    };
+
+    console.log('Serial #: ' + packet.serialNumber);
+    console.log('ID: ' + sensorId);
+    console.log('v:' + JSON.stringify(json['vibration']));
+    console.log('h:' + JSON.stringify(json['humidity']));
+    console.log('t:' + JSON.stringify(json['temperature']));
+
+    payload['vibration'] = cbor.encode(json);
+    payload['humidity'] = cbor.encode(json);
+    payload['temperature'] = cbor.encode(json);
 
     // console.log('MQTT Payload: ' + payload);
+
+    return;
 
     let prefix = '/';
     if (config.prefix !== '') {
         prefix += config.prefix + '/';
     }
-    client.publish(prefix + 'v1/' + sensorId + '/' + sensor, payload);
+
+    client.publish(prefix + sensorId + '/' + source + '/v1/vibration', payload['vibration']);
+    client.publish(prefix + sensorId + '/' + source + '/v1/humidity', payload['humidity']);
+    client.publish(prefix + sensorId + '/' + source + '/v1/temperature', payload['temperature']);
 }
