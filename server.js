@@ -98,7 +98,7 @@ serialParser.on('data', function (data) {
 
         console.log('Fixed data: ' + hexString);
 
-        if (hexString.length !== 14) return;
+        if (hexString.length !== 28) return;
 
         const buffer = Buffer.from(hexString, 'hex');
 
