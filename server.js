@@ -113,7 +113,10 @@ serialParser.on('data', function (data) {
         let packet = parser.parse(buffer);
 
         //console.log('Parsed: ' + JSON.stringify(packet));
-        console.log('Serial number: ' + Math.round(packet.serialNumber * 10) / 10);
+
+        packet.serialNumber = Math.round(packet.serialNumber * 10) / 10;
+
+        console.log('Serial number: ' + packet.serialNumber);
         console.log('Vibration: ' + packet.vibration);
         console.log('Humidity: ' + packet.humidity);
         console.log('Temperature: ' + packet.temperature);
