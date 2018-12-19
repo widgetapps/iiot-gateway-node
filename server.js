@@ -49,13 +49,6 @@ let serialport = new SerialPort('/dev/ttymxc7', {
     baudRate: 9600
 });
 
-const parser = serialport.pipe(new Readline({ delimiter: '\n' }));
-
-parser.on('data', function (data) {
-    let hexString = data.toString();
-    console.log('Got data: ' + hexString);
-});
-
 /*
 
 serialport.on('readable', function () {
@@ -86,6 +79,39 @@ serialport.on('open', function() {
 serialport.on('error', function(err) {
     console.log('Error: ', err.message);
     process.exit(1);
+});
+
+const serialParser = serialport.pipe(new Readline({ delimiter: '\n' }));
+
+serialParser.on('data', function (data) {
+    if (mqttConnected) {
+        let hexString = data.toString();
+        console.log('Got data: ' + hexString);
+
+        if  (hexString.substr(0,4) !== 'DEAD') {
+            let beginning = hexString.substr(8, 12);
+            let middle = hexString.substr(0, 8);
+            let end = hexString.substr(20);
+            hexString = beginning + middle + end;
+            if (hexString.substr(0,4) !== 'DEAD') return;
+        }
+
+        console.log('Fixed data: ' + hexString);
+
+        if (hexString.length !== 14) return;
+
+        const buffer = Buffer.from(hexString, 'hex');
+
+        let parser = new Parser()
+            .endianess('big')
+            .uint16('stx')
+            .uint8('sensor')
+            .float('value');
+
+        let packet = parser.parse(buffer);
+
+        //sendPayload(packet.sensor, packet.value);
+    }
 });
 
 /*
