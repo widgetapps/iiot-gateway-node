@@ -137,7 +137,7 @@ function sendPayload(packet) {
     console.log('t:' + payload['temperature']);
     */
 
-    let prefix = '/';
+    let prefix = '';
     if (config.prefix !== '') {
         prefix += config.prefix + '/';
     }
