@@ -108,7 +108,7 @@ function sendPayload(packet) {
 
     json['vibration'] = {
         date: new Date(),
-        value: Math.round(packet.vibration * config.multiplier)
+        value: packet.vibration * config.multiplier
     };
     json['humidity'] = {
         date: new Date(),
@@ -128,6 +128,9 @@ function sendPayload(packet) {
     payload['vibration'] = cbor.encode(json);
     payload['humidity'] = cbor.encode(json);
     payload['temperature'] = cbor.encode(json);
+    console.log('v:' + payload['vibration']);
+    console.log('h:' + payload['humidity']);
+    console.log('t:' + payload['temperature']);
 
     // console.log('MQTT Payload: ' + payload);
 
