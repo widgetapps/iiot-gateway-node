@@ -57,7 +57,7 @@ const serialParser = serialport.pipe(new Readline({ delimiter: '\n' }));
 serialParser.on('data', function (data) {
     if (mqttConnected) {
         let hexString = data.toString();
-        console.log('Got data:   ' + hexString);
+        // console.log('Got data:   ' + hexString);
 
         if  (hexString.substr(0,4) !== 'DEAD') {
             let beginning = hexString.substr(8, 12);
@@ -121,20 +121,20 @@ function sendPayload(packet) {
 
     console.log('Serial #: ' + packet.serialNumber);
     console.log('ID: ' + sensorId);
+    /*
     console.log('v:' + JSON.stringify(json['vibration']));
     console.log('h:' + JSON.stringify(json['humidity']));
     console.log('t:' + JSON.stringify(json['temperature']));
+    */
 
+    /*
     payload['vibration'] = cbor.encode(json['vibration']);
     payload['humidity'] = cbor.encode(json['humidity']);
     payload['temperature'] = cbor.encode(json['temperature']);
     console.log('v:' + payload['vibration']);
     console.log('h:' + payload['humidity']);
     console.log('t:' + payload['temperature']);
-
-    // console.log('MQTT Payload: ' + payload);
-
-    return;
+    */
 
     let prefix = '/';
     if (config.prefix !== '') {
