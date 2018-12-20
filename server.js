@@ -89,7 +89,7 @@ serialParser.on('data', function (data) {
 
 function sendPayload(packet) {
 
-    let sensorId = md5(packet.serialNumber);
+    let sensorId = md5(packet.serialNumber.toString());
     let source = 'gateway';
 
     let json = {};
