@@ -55,7 +55,7 @@ serialport.on('error', function(err) {
 const serialParser = serialport.pipe(new Readline({ delimiter: '\n' }));
 
 serialParser.on('data', function (data) {
-    console.log('Data received:' + data.toString());
+    // console.log('Data received:' + data.toString());
     if (mqttConnected) {
         let hexString = data.toString();
 
@@ -119,7 +119,7 @@ function sendPayload(packet) {
 
     let topicPrefix = prefix + sensorId + '/' + source + '/v1/';
 
-    console.log('TOPIC: ' + topicPrefix + 'vibration');
+    // console.log('TOPIC: ' + topicPrefix + 'vibration');
 
     client.publish(topicPrefix + 'vibration', payload['vibration']);
     client.publish(topicPrefix + 'humidity', payload['humidity']);
