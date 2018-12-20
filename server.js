@@ -118,6 +118,8 @@ function sendPayload(packet) {
 
     let topicPrefix = prefix + sensorId + '/' + source + '/v1/';
 
+    console.log('TOPIC: ' + topicPrefix + 'vibration');
+
     client.publish(topicPrefix + 'vibration', payload['vibration']);
     client.publish(topicPrefix + 'humidity', payload['humidity']);
     client.publish(topicPrefix + 'temperature', payload['temperature']);
