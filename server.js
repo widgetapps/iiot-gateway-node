@@ -55,6 +55,7 @@ serialport.on('error', function(err) {
 const serialParser = serialport.pipe(new Readline({ delimiter: '\n' }));
 
 serialParser.on('data', function (data) {
+    console.log('Data received:' + data.toString());
     if (mqttConnected) {
         let hexString = data.toString();
 
