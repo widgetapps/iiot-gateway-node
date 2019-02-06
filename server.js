@@ -24,6 +24,8 @@ fs.readFile(config.configpath + 'config.json', 'utf8', (err, data) => {
         config.multiplier = configObj.multiplier;
         config.mqttoptions.username = configObj.mqttlogin;
         config.mqttoptions.password = configObj.mqttpassword;
+        config.mqttoptions.clientId += '_' + Math.floor(Math.random() * 10000);
+
         client = mqtt.connect(config.mqtt, config.mqttoptions);
 
         client.on('error', function (error) {
@@ -32,7 +34,7 @@ fs.readFile(config.configpath + 'config.json', 'utf8', (err, data) => {
         });
 
         client.on('connect', function () {
-            console.log('Connected to MQTT server.');
+            console.log('Connected to MQTT server with client ID ' +config.mqttoptions.clientId);
             mqttConnected = true;
         });
     }
