@@ -24,7 +24,7 @@ fs.readFile(config.configpath + 'config.json', 'utf8', (err, data) => {
         config.multiplier = configObj.multiplier;
         config.mqttoptions.username = configObj.mqttlogin;
         config.mqttoptions.password = configObj.mqttpassword;
-        config.mqttoptions.clientId += '.' + Math.floor(Math.random() * 1000);
+        config.mqttoptions.clientId += '.' + process.pid;
 
         client = mqtt.connect(config.mqtt, config.mqttoptions);
 
